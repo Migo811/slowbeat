@@ -704,6 +704,333 @@
       text-transform: uppercase;
     }
 
+    /* ── IMPACT MODULES ──────────────────────────────────── */
+    .impact {
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+    }
+
+    .impact-header {
+      margin-bottom: 56px;
+    }
+
+    .impact h2 {
+      font-weight: 700;
+      font-size: clamp(32px, 4vw, 52px);
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .impact-intro {
+      font-size: 16px;
+      color: var(--sub);
+      max-width: 600px;
+      line-height: 1.7;
+    }
+
+    /* Module cards */
+    .impact-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .impact-module {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 48px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .module-accent {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 3px;
+      height: 100%;
+    }
+
+    .module-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 36px;
+    }
+
+    .module-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .module-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .module-title {
+      font-weight: 700;
+      font-size: 22px;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    /* Physiological timeline */
+    .phys-timeline {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      margin-bottom: 32px;
+    }
+
+    .phys-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 24px 20px;
+    }
+
+    .phys-time {
+      font-family: var(--mono);
+      font-size: 28px;
+      font-weight: 400;
+      line-height: 1;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .phys-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .phys-desc {
+      font-size: 13px;
+      color: var(--sub);
+      line-height: 1.7;
+    }
+
+    .phys-desc strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    /* Cortisol bar visual */
+    .cortisol-bar-wrap {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 24px 24px 16px;
+    }
+
+    .cortisol-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .cortisol-title {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--sub);
+    }
+
+    .cortisol-tag {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--rose);
+      background: rgba(248,113,113,0.08);
+      border: 1px solid rgba(248,113,113,0.15);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .cortisol-track {
+      height: 8px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .cortisol-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: linear-gradient(to right, rgba(248,113,113,0.3), var(--rose));
+    }
+
+    .cortisol-markers {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .c-marker {
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--muted);
+    }
+
+    /* Time perception layout */
+    .time-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+    }
+
+    .time-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 28px 24px;
+    }
+
+    .time-card-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .time-card-title {
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .time-card-desc {
+      font-size: 13px;
+      color: var(--sub);
+      line-height: 1.7;
+    }
+
+    .time-card-desc strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    /* Resilience grid */
+    .resilience-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2px;
+    }
+
+    .resilience-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 28px 24px;
+    }
+
+    .resilience-tag {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: rgba(79,209,197,0.08);
+      border: 1px solid rgba(79,209,197,0.15);
+      color: var(--teal);
+      padding: 3px 10px;
+      border-radius: 4px;
+      margin-bottom: 14px;
+    }
+
+    .resilience-title {
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .resilience-desc {
+      font-size: 13px;
+      color: var(--sub);
+      line-height: 1.7;
+    }
+
+    .resilience-desc strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    /* Box breathing visual */
+    .box-breath {
+      display: flex;
+      gap: 4px;
+      margin-top: 16px;
+    }
+
+    .box-step {
+      flex: 1;
+      background: rgba(79,209,197,0.06);
+      border: 1px solid rgba(79,209,197,0.12);
+      border-radius: 4px;
+      padding: 10px 4px;
+      text-align: center;
+    }
+
+    .box-step-num {
+      font-family: var(--mono);
+      font-size: 18px;
+      color: var(--teal);
+      display: block;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .box-step-label {
+      font-size: 9px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: block;
+    }
+
+    .bottom-line {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--teal);
+      padding: 24px 28px;
+      margin-top: 2px;
+    }
+
+    .bottom-line p {
+      font-size: 14px;
+      color: var(--sub);
+      line-height: 1.8;
+    }
+
+    .bottom-line strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    @media (max-width: 900px) {
+      .impact-module { padding: 32px 24px; }
+      .phys-timeline { grid-template-columns: 1fr; }
+      .time-grid { grid-template-columns: 1fr; }
+      .resilience-grid { grid-template-columns: 1fr; }
+    }
+
     /* ── FOOTER ───────────────────────────────────────────── */
     footer {
       border-top: 1px solid var(--border);
@@ -829,6 +1156,7 @@
     <div class="nav-right">
       <a href="#how" class="nav-link">How it works</a>
       <a href="#science" class="nav-link">Science</a>
+      <a href="#impact" class="nav-link">Your Body</a>
       <a href="../" class="nav-cta">Try Free</a>
     </div>
   </nav>
@@ -1051,6 +1379,168 @@
           <span class="stage-name">Silence</span>
           <span class="stage-time">0:30</span>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- IMPACT MODULES -->
+  <section class="impact" id="impact">
+    <div class="section-inner">
+
+      <div class="impact-header r">
+        <span class="eyebrow">Why You're Exhausted</span>
+        <h2>This is not just "bad sleep."</h2>
+        <p class="impact-intro">Disrupted sleep — especially from recurring stress or external alerts — causes measurable physiological damage. Understanding what is happening helps reduce the secondary suffering of trying to act normally in an abnormal situation.</p>
+      </div>
+
+      <div class="impact-grid">
+
+        <!-- MODULE 1: PHYSIOLOGICAL IMPACT -->
+        <div class="impact-module r">
+          <div class="module-accent" style="background: var(--rose);"></div>
+          <div class="module-header">
+            <div class="module-icon" style="background: rgba(248,113,113,0.1); color: var(--rose);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+                <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                <line x1="9" y1="9" x2="9.01" y2="9" stroke-width="3"/>
+                <line x1="15" y1="9" x2="15.01" y2="9" stroke-width="3"/>
+              </svg>
+            </div>
+            <div>
+              <span class="module-label" style="color: var(--rose);">Module 1 — Physiology</span>
+              <div class="module-title">Cortisol Stacking &amp; REM Depletion</div>
+            </div>
+          </div>
+
+          <div class="phys-timeline">
+            <div class="phys-card">
+              <span class="phys-time" style="color: var(--lavender);">2 AM</span>
+              <span class="phys-label" style="color: var(--lavender);">Deep Sleep Window</span>
+              <p class="phys-desc">The brain's <strong>glymphatic system</strong> is active — flushing metabolic waste. Disruption here is why you wake up with <strong>brain fog and heavy grogginess</strong>, regardless of total sleep hours.</p>
+            </div>
+            <div class="phys-card">
+              <span class="phys-time" style="color: var(--amber);">6 AM</span>
+              <span class="phys-label" style="color: var(--amber);">REM Sleep Window</span>
+              <p class="phys-desc">REM is the brain's <strong>emotional thermostat</strong>. Interrupting it leaves every emotion feeling <strong>raw and unregulated</strong> — lower frustration threshold, higher irritability, all day.</p>
+            </div>
+            <div class="phys-card">
+              <span class="phys-time" style="color: var(--rose);">→ AM</span>
+              <span class="phys-label" style="color: var(--rose);">Cortisol Stacking</span>
+              <p class="phys-desc">Adrenaline from 2 AM doesn't fully clear by 6 AM. Your body <strong>accumulates high-alert stress hormones</strong>, maintaining a threat-ready state even during sleep — causing profound systemic exhaustion.</p>
+            </div>
+          </div>
+
+          <div class="cortisol-bar-wrap">
+            <div class="cortisol-label-row">
+              <span class="cortisol-title">Cortisol level across the night (high-stress environment)</span>
+              <span class="cortisol-tag">Never fully clears</span>
+            </div>
+            <div class="cortisol-track">
+              <div class="cortisol-fill" style="width: 88%;"></div>
+            </div>
+            <div class="cortisol-markers">
+              <span class="c-marker">10 PM</span>
+              <span class="c-marker">2 AM · alert</span>
+              <span class="c-marker">4 AM</span>
+              <span class="c-marker">6 AM · alert</span>
+              <span class="c-marker">8 AM</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- MODULE 2: TIME PERCEPTION -->
+        <div class="impact-module r r-delay-1">
+          <div class="module-accent" style="background: var(--amber);"></div>
+          <div class="module-header">
+            <div class="module-icon" style="background: rgba(251,191,36,0.1); color: var(--amber);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <div>
+              <span class="module-label" style="color: var(--amber);">Module 2 — Psychology</span>
+              <div class="module-title">The Waiting Tax on Your Mind</div>
+            </div>
+          </div>
+
+          <div class="time-grid">
+            <div class="time-card">
+              <span class="time-card-label" style="color: var(--amber);">Anticipatory Anxiety</span>
+              <div class="time-card-title">The siren is not the burden</div>
+              <p class="time-card-desc">The heaviest mental cost is the <strong>waiting between alerts</strong>. Your brain constantly scans for siren-like sounds — fans, motorcycles, wind — burning energy continuously, even in silence.</p>
+            </div>
+            <div class="time-card">
+              <span class="time-card-label" style="color: var(--amber);">Temporal Myopia</span>
+              <div class="time-card-title">The future feels unreachable</div>
+              <p class="time-card-desc">When survival is the priority, long-term thinking shuts down. You shift to <strong>short-termism</strong> — and this causes massive <strong>decision fatigue</strong> over even small daily choices.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- MODULE 3: RESILIENCE -->
+        <div class="impact-module r r-delay-2">
+          <div class="module-accent" style="background: var(--teal);"></div>
+          <div class="module-header">
+            <div class="module-icon" style="background: rgba(79,209,197,0.1); color: var(--teal);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <div>
+              <span class="module-label" style="color: var(--teal);">Module 3 — Resilience</span>
+              <div class="module-title">Four Techniques That Actually Work</div>
+            </div>
+          </div>
+
+          <div class="resilience-grid">
+            <div class="resilience-card">
+              <span class="resilience-tag">6Cs Method</span>
+              <div class="resilience-title">Shift from fear to logic</div>
+              <p class="resilience-desc">When anxiety spikes, force your brain to answer factual questions: <strong>"What is my ID number?" "How many people are here?"</strong> This shifts activity from the amygdala to the prefrontal cortex — logic overrides panic.</p>
+            </div>
+            <div class="resilience-card">
+              <span class="resilience-tag">Decision Hygiene</span>
+              <div class="resilience-title">The "Good Enough" rule</div>
+              <p class="resilience-desc">Stop seeking the perfect choice for daily decisions (food, clothes, route). Use <strong>"Good Enough"</strong> to conserve mental energy for safety-critical decisions — where that energy actually matters.</p>
+            </div>
+            <div class="resilience-card">
+              <span class="resilience-tag">Box Breathing</span>
+              <div class="resilience-title">Mechanical vagal reset</div>
+              <p class="resilience-desc">The 4-4-4-4 technique directly triggers the vagal nerve and forces heart rate down — the same physiological pathway SlowBeat uses. Not meditation. A <strong>physical override</strong>.</p>
+              <div class="box-breath">
+                <div class="box-step">
+                  <span class="box-step-num">4s</span>
+                  <span class="box-step-label">Inhale</span>
+                </div>
+                <div class="box-step">
+                  <span class="box-step-num">4s</span>
+                  <span class="box-step-label">Hold</span>
+                </div>
+                <div class="box-step">
+                  <span class="box-step-num">4s</span>
+                  <span class="box-step-label">Exhale</span>
+                </div>
+                <div class="box-step">
+                  <span class="box-step-num">4s</span>
+                  <span class="box-step-label">Hold</span>
+                </div>
+              </div>
+            </div>
+            <div class="resilience-card">
+              <span class="resilience-tag">Cognitive Offloading</span>
+              <div class="resilience-title">Write it before bed</div>
+              <p class="resilience-desc">Write down every task and worry before trying to sleep. This signals to the brain: <strong>"It's safe to let go."</strong> Without this, the brain stays alert to avoid forgetting critical information.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTTOM LINE -->
+        <div class="bottom-line r">
+          <p><strong>The exhaustion you feel is not weakness.</strong> It is the physiological cost of your body working overtime to keep you safe. Accepting this is the first step in reducing the "secondary suffering" of trying to act normally in an abnormal situation. SlowBeat is designed for exactly this — a tool to help your nervous system find its way back down.</p>
+        </div>
+
       </div>
     </div>
   </section>
