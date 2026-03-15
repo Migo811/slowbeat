@@ -6,21 +6,24 @@
   <title>SlowBeat</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=DM+Mono:wght@400&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:       #f8f6f3;
-      --rose:     #c96b80;
-      --lavender: #8b78c8;
-      --sage:     #4aada7;
-      --dblue:    #4a87a8;
-      --stone:    #2e2a27;
-      --mid:      #5a5450;
-      --ink:      #8a8480;
-      --hairline: rgba(46, 42, 39, 0.12);
-      --sans:     'DM Sans', sans-serif;
+      --bg:       #0d1321;
+      --surface:  #131c2e;
+      --surface2: #1a2540;
+      --border:   rgba(242,240,236,0.08);
+      --border2:  rgba(242,240,236,0.14);
+      --text:     #f2f0ec;
+      --sub:      rgba(242,240,236,0.55);
+      --muted:    rgba(242,240,236,0.3);
+      --coral:    #e8736a;
+      --seafoam:  #6bc4b8;
+      --amber:    #f5a623;
+      --lavender: #8f7fd4;
+      --sans:     'Outfit', system-ui, sans-serif;
       --mono:     'DM Mono', 'Courier New', monospace;
     }
 
@@ -32,7 +35,7 @@
 
     body {
       background: var(--bg);
-      color: var(--stone);
+      color: var(--text);
       font-family: var(--sans);
       display: flex;
       flex-direction: column;
@@ -46,28 +49,28 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Warm grain */
+    /* Grain overlay — warm, subtle */
     body::after {
       content: '';
       position: fixed; inset: 0;
       pointer-events: none; z-index: 999;
-      opacity: 0.035;
+      opacity: 0.04;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
       background-size: 200px 200px;
     }
 
-    /* Ambient blush behind orb */
+    /* Ambient radial glow behind orb */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
-      background: radial-gradient(ellipse at 50% 38%, rgba(232, 164, 178, 0.08) 0%, transparent 58%);
+      background: radial-gradient(ellipse at 50% 40%, rgba(232,115,106,0.07) 0%, transparent 58%);
       transition: background 3s ease;
       pointer-events: none;
       z-index: 0;
     }
 
-    /* ── HEADER ──────────────────────────────────────────────────────────── */
+    /* ── HEADER ─────────────────────────────────────────────── */
     .header {
       position: relative;
       z-index: 1;
@@ -78,8 +81,9 @@
     .app-name {
       font-family: var(--mono);
       font-size: 12px;
-      letter-spacing: 0.12em;
-      color: var(--ink);
+      letter-spacing: 0.14em;
+      color: var(--muted);
+      text-transform: uppercase;
     }
 
     /* Stage badge */
@@ -88,15 +92,16 @@
       display: inline-flex;
       align-items: center;
       gap: 7px;
-      border: 1px solid rgba(232, 164, 178, 0.3);
-      border-radius: 20px;
+      border: 1px solid rgba(232,115,106,0.25);
+      border-radius: 6px;
       padding: 5px 14px 5px 10px;
-      background: rgba(232, 164, 178, 0.06);
+      background: rgba(232,115,106,0.06);
       font-family: var(--sans);
       font-size: 11px;
-      font-weight: 300;
-      letter-spacing: 0.06em;
-      color: var(--rose);
+      font-weight: 400;
+      letter-spacing: 0.07em;
+      color: var(--coral);
+      text-transform: uppercase;
       transition: background 2.5s ease, border-color 2.5s ease, color 2.5s ease;
     }
 
@@ -104,7 +109,7 @@
       width: 5px;
       height: 5px;
       border-radius: 50%;
-      background: var(--rose);
+      background: var(--coral);
       transition: background 2.5s ease;
       animation: dotPulse 2.5s ease-in-out infinite;
     }
@@ -114,7 +119,7 @@
       50%       { opacity: 0.35; }
     }
 
-    /* ── CENTER ──────────────────────────────────────────────────────────── */
+    /* ── CENTER ─────────────────────────────────────────────── */
     .center-stage {
       position: relative;
       z-index: 1;
@@ -125,13 +130,13 @@
       flex: 1;
     }
 
-    /* Breathing ring — behind orb, only visible when running */
+    /* Breathing ring */
     .breathing-ring {
       position: absolute;
       width: 300px;
       height: 300px;
       border-radius: 50%;
-      border: 1px solid rgba(232, 164, 178, 0.15);
+      border: 1px solid rgba(232,115,106,0.1);
       opacity: 0;
       transition: border-color 2.5s ease;
       pointer-events: none;
@@ -143,9 +148,9 @@
     }
 
     @keyframes breathe {
-      0%   { transform: scale(1);    opacity: 0.18; }
+      0%   { transform: scale(1);    opacity: 0.22; }
       45%  { transform: scale(1.14); opacity: 0.08; }
-      100% { transform: scale(1);    opacity: 0.18; }
+      100% { transform: scale(1);    opacity: 0.22; }
     }
 
     /* Ripple rings */
@@ -160,27 +165,21 @@
       position: absolute;
       inset: 0;
       border-radius: 50%;
-      border: 1px solid rgba(232, 164, 178, 0.4);
+      border: 1px solid rgba(232,115,106,0.35);
       opacity: 0;
       transition: border-color 2.5s ease;
     }
 
-    .ripple.fire {
-      animation: rippleOut 1.1s ease-out forwards;
-    }
+    .ripple.fire      { animation: rippleOut  1.1s ease-out forwards; }
+    .ripple-2.fire    { animation: rippleOut2 1.4s ease-out forwards; }
 
-    .ripple-2.fire {
-      animation: rippleOut2 1.4s ease-out forwards;
+    @keyframes rippleOut  {
+      0%   { transform: scale(1);    opacity: 0.55; }
+      100% { transform: scale(1.7);  opacity: 0;    }
     }
-
-    @keyframes rippleOut {
-      0%   { transform: scale(1);    opacity: 0.5; }
-      100% { transform: scale(1.65); opacity: 0;   }
-    }
-
     @keyframes rippleOut2 {
-      0%   { transform: scale(1);    opacity: 0.25; }
-      100% { transform: scale(2.0);  opacity: 0;    }
+      0%   { transform: scale(1);    opacity: 0.28; }
+      100% { transform: scale(2.1);  opacity: 0;    }
     }
 
     /* Main orb */
@@ -194,14 +193,13 @@
       align-items: center;
       justify-content: center;
       transition: box-shadow 2.5s ease, background 2.5s ease;
-      background: radial-gradient(circle at 36% 32%, rgba(255, 248, 250, 0.98) 0%, rgba(232, 164, 178, 0.18) 45%, transparent 72%);
+      background: radial-gradient(circle at 50% 42%, rgba(232,115,106,0.28) 0%, rgba(232,115,106,0.07) 50%, transparent 72%);
       box-shadow:
-        0 0 0 1px rgba(232, 164, 178, 0.18),
-        0 12px 48px rgba(232, 164, 178, 0.14),
-        0 4px 16px rgba(232, 164, 178, 0.08);
+        0 0 0 1px rgba(232,115,106,0.14),
+        0 0 60px rgba(232,115,106,0.18),
+        0 0 120px rgba(232,115,106,0.07);
     }
 
-    /* Idle: very soft breathing glow */
     .idle .main-circle {
       animation: idleBreath 5s ease-in-out infinite;
     }
@@ -209,64 +207,61 @@
     @keyframes idleBreath {
       0%, 100% {
         box-shadow:
-          0 0 0 1px rgba(232, 164, 178, 0.15),
-          0 10px 40px rgba(232, 164, 178, 0.1),
-          0 4px 12px rgba(232, 164, 178, 0.06);
+          0 0 0 1px rgba(232,115,106,0.1),
+          0 0 40px rgba(232,115,106,0.12),
+          0 0 80px rgba(232,115,106,0.05);
       }
       50% {
         box-shadow:
-          0 0 0 1px rgba(232, 164, 178, 0.28),
-          0 16px 60px rgba(232, 164, 178, 0.2),
-          0 6px 20px rgba(232, 164, 178, 0.12);
+          0 0 0 1px rgba(232,115,106,0.2),
+          0 0 70px rgba(232,115,106,0.22),
+          0 0 140px rgba(232,115,106,0.1);
       }
     }
 
-    /* Beat pulse: subtle, like a breath */
     .main-circle.beat {
       animation: beatPulse 0.3s ease-out forwards;
     }
 
     @keyframes beatPulse {
       0%   { transform: scale(1); }
-      25%  { transform: scale(1.038); }
+      25%  { transform: scale(1.045); }
       100% { transform: scale(1); }
     }
 
-    /* Paused: slightly dimmed */
     .paused .main-circle {
-      opacity: 0.6;
+      opacity: 0.5;
     }
 
-    /* BPM number — large, instantly readable */
+    /* BPM number */
     .bpm-number {
       font-family: var(--sans);
       font-weight: 700;
       font-size: 80px;
-      color: var(--rose);
+      color: var(--text);
       line-height: 1;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.04em;
       transition: color 2s ease;
     }
 
     .bpm-label {
       font-family: var(--mono);
       font-size: 11px;
-      letter-spacing: 0.16em;
-      color: var(--ink);
+      letter-spacing: 0.18em;
+      color: var(--muted);
       margin-top: 6px;
       text-transform: uppercase;
-      transition: color 2s ease;
     }
 
     .time-elapsed {
       font-family: var(--mono);
       font-size: 12px;
-      color: var(--mid);
+      color: var(--sub);
       margin-top: 8px;
       letter-spacing: 0.04em;
     }
 
-    /* ── BOTTOM ──────────────────────────────────────────────────────────── */
+    /* ── BOTTOM ─────────────────────────────────────────────── */
     .bottom-section {
       position: relative;
       z-index: 1;
@@ -297,8 +292,8 @@
 
     .segment {
       height: 100%;
-      border-radius: 1px;
-      background: rgba(74, 69, 64, 0.1);
+      border-radius: 2px;
+      background: rgba(242,240,236,0.06);
       position: relative;
       overflow: hidden;
       transition: background 0.5s ease;
@@ -308,8 +303,8 @@
       position: absolute;
       inset: 0;
       width: 0%;
-      background: var(--rose);
-      border-radius: 1px;
+      background: var(--coral);
+      border-radius: 2px;
       transition: background 2.5s ease;
     }
 
@@ -322,15 +317,15 @@
     .stage-label {
       font-family: var(--sans);
       font-size: 9px;
-      font-weight: 300;
-      letter-spacing: 0.07em;
+      font-weight: 400;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--ink);
+      color: var(--muted);
       transition: color 0.4s ease;
     }
 
     .stage-label.active {
-      color: var(--rose);
+      color: var(--coral);
       transition: color 2.5s ease;
     }
 
@@ -344,7 +339,7 @@
 
     .volume-icon {
       flex-shrink: 0;
-      color: var(--ink);
+      color: var(--muted);
       width: 16px;
       height: 16px;
     }
@@ -352,7 +347,7 @@
     .volume-label {
       font-family: var(--mono);
       font-size: 10px;
-      color: var(--ink);
+      color: var(--muted);
       letter-spacing: 0.08em;
       flex-shrink: 0;
       min-width: 40px;
@@ -362,9 +357,9 @@
       -webkit-appearance: none;
       appearance: none;
       flex: 1;
-      height: 1px;
-      background: rgba(74, 69, 64, 0.15);
-      border-radius: 1px;
+      height: 2px;
+      background: rgba(242,240,236,0.1);
+      border-radius: 2px;
       outline: none;
       cursor: pointer;
     }
@@ -375,10 +370,10 @@
       width: 14px;
       height: 14px;
       border-radius: 50%;
-      background: var(--rose);
+      background: var(--seafoam);
       cursor: pointer;
-      border: 2px solid white;
-      box-shadow: 0 1px 6px rgba(232, 164, 178, 0.35);
+      border: 2px solid var(--bg);
+      box-shadow: 0 0 10px rgba(107,196,184,0.4);
       transition: background 2.5s ease;
     }
 
@@ -386,10 +381,10 @@
       width: 14px;
       height: 14px;
       border-radius: 50%;
-      background: var(--rose);
+      background: var(--seafoam);
       cursor: pointer;
-      border: 2px solid white;
-      box-shadow: 0 1px 6px rgba(232, 164, 178, 0.35);
+      border: 2px solid var(--bg);
+      box-shadow: 0 0 10px rgba(107,196,184,0.4);
     }
 
     /* CTA button */
@@ -397,26 +392,22 @@
       width: 100%;
       max-width: 260px;
       padding: 14px 32px;
-      border-radius: 50px;
-      border: 1.5px solid var(--rose);
-      background: var(--rose);
-      color: #fff;
+      border-radius: 12px;
+      border: none;
+      background: var(--coral);
+      color: #0d1321;
       font-family: var(--sans);
       font-size: 14px;
-      font-weight: 500;
-      letter-spacing: 0.04em;
+      font-weight: 600;
+      letter-spacing: 0.02em;
       cursor: pointer;
       position: relative;
-      transition: background 0.25s ease, border-color 2.5s ease, color 0.25s ease, opacity 0.25s ease;
+      transition: background 2.5s ease, box-shadow 2.5s ease, opacity 0.2s ease;
+      box-shadow: 0 4px 24px rgba(232,115,106,0.3);
     }
 
-    .cta-button:hover {
-      opacity: 0.88;
-    }
-
-    .cta-button:active {
-      transform: scale(0.98);
-    }
+    .cta-button:hover { opacity: 0.88; }
+    .cta-button:active { transform: scale(0.98); }
 
     /* Tagline */
     .tagline {
@@ -425,17 +416,11 @@
       font-weight: 300;
       font-style: italic;
       font-size: 10px;
-      color: var(--ink);
+      color: var(--muted);
       line-height: 1.65;
       letter-spacing: 0.02em;
       max-width: 280px;
     }
-
-    /* Stage color classes (body-level, for CSS cascade) */
-    .color-rose     { --current: var(--rose);     }
-    .color-lavender { --current: var(--lavender);  }
-    .color-sage     { --current: var(--sage);      }
-    .color-dblue    { --current: var(--dblue);     }
 
     /* Larger screens */
     @media (min-height: 800px) {
@@ -452,7 +437,7 @@
     }
   </style>
 </head>
-<body class="idle color-rose" id="appRoot">
+<body class="idle" id="appRoot">
 
   <!-- HEADER -->
   <header class="header">
@@ -518,13 +503,12 @@
   'use strict';
 
   // ── STAGE DEFINITIONS ─────────────────────────────────────────────────────
-  // Soft palette: rose → lavender → sage → dusty blue
   const STAGES = [
-    { name: 'Awake',       startMin: 0,  endMin: 5,  startBpm: 65, endBpm: 60, colorClass: 'color-rose',     accentHex: '#e8a4b2', glowRgba: '232,164,178' },
-    { name: 'Drifting',    startMin: 5,  endMin: 12, startBpm: 60, endBpm: 55, colorClass: 'color-lavender', accentHex: '#c4b5e8', glowRgba: '196,181,232' },
-    { name: 'Light Sleep', startMin: 12, endMin: 22, startBpm: 55, endBpm: 50, colorClass: 'color-sage',     accentHex: '#9ec9c4', glowRgba: '158,201,196' },
-    { name: 'Deep Sleep',  startMin: 22, endMin: 30, startBpm: 50, endBpm: 45, colorClass: 'color-dblue',    accentHex: '#7ba7bc', glowRgba: '123,167,188' },
-    { name: 'Sleeping',    startMin: 30, endMin: 35, startBpm: 45, endBpm: 45, colorClass: 'color-dblue',    accentHex: '#a8b8c0', glowRgba: '168,184,192' },
+    { name: 'Awake',       startMin: 0,  endMin: 5,  startBpm: 65, endBpm: 60, accentHex: '#e8736a', glowRgba: '232,115,106' },
+    { name: 'Drifting',    startMin: 5,  endMin: 12, startBpm: 60, endBpm: 55, accentHex: '#e8a068', glowRgba: '232,160,104' },
+    { name: 'Light Sleep', startMin: 12, endMin: 22, startBpm: 55, endBpm: 50, accentHex: '#7bbdb8', glowRgba: '123,189,184' },
+    { name: 'Deep Sleep',  startMin: 22, endMin: 30, startBpm: 50, endBpm: 45, accentHex: '#6bc4b8', glowRgba: '107,196,184' },
+    { name: 'Sleeping',    startMin: 30, endMin: 35, startBpm: 45, endBpm: 45, accentHex: '#4a9e96', glowRgba:  '74,158,150' },
   ];
 
   const FADE_START_SECONDS = 30 * 60;
@@ -653,7 +637,7 @@
 
     // Fade out after deep sleep (REM micro-arousal prevention)
     if (masterGain && elapsed >= FADE_START_SECONDS) {
-      const progress  = Math.min(1, (elapsed - FADE_START_SECONDS) / (FADE_END_SECONDS - FADE_START_SECONDS));
+      const progress   = Math.min(1, (elapsed - FADE_START_SECONDS) / (FADE_END_SECONDS - FADE_START_SECONDS));
       const targetGain = getVolume() * (1 - progress);
       masterGain.gain.setTargetAtTime(targetGain, audioCtx.currentTime, 0.5);
       if (progress >= 1) {
@@ -678,53 +662,50 @@
   }
 
   function applyStageColor(idx) {
-    const root  = document.getElementById('appRoot');
-    const badge = document.getElementById('stageBadge');
-    const dot   = document.getElementById('stageDot');
+    const badge  = document.getElementById('stageBadge');
+    const dot    = document.getElementById('stageDot');
     const bpmNum = document.getElementById('bpmDisplay');
-    const stage = STAGES[idx];
-    const h = stage.accentHex;
-    const g = stage.glowRgba;
+    const stage  = STAGES[idx];
+    const h      = stage.accentHex;
+    const g      = stage.glowRgba;
 
-    STAGES.forEach(s => root.classList.remove(s.colorClass));
-    root.classList.add(stage.colorClass);
-
-    // Stage badge — soft fill
-    badge.style.background   = hexToRgba(h, 0.07);
-    badge.style.borderColor  = hexToRgba(h, 0.28);
-    badge.style.color        = h;
-    dot.style.background     = h;
+    // Stage badge
+    badge.style.background  = hexToRgba(h, 0.08);
+    badge.style.borderColor = hexToRgba(h, 0.22);
+    badge.style.color       = h;
+    dot.style.background    = h;
     document.getElementById('stageText').textContent = stage.name;
 
-    // BPM number & label
-    bpmNum.style.color = h;
-    document.querySelector('.bpm-label').style.color = hexToRgba(h, 0.5);
+    // BPM label stays warm white — glow is in the orb
+    bpmNum.style.color = 'var(--text)';
+    document.querySelector('.bpm-label').style.color = hexToRgba(h, 0.45);
 
-    // Ripples — thin, soft
-    document.getElementById('ripple1').style.borderColor = hexToRgba(h, 0.42);
-    document.getElementById('ripple2').style.borderColor = hexToRgba(h, 0.22);
+    // Ripples
+    document.getElementById('ripple1').style.borderColor = hexToRgba(h, 0.38);
+    document.getElementById('ripple2').style.borderColor = hexToRgba(h, 0.18);
 
     // Breathing ring
-    document.getElementById('breathingRing').style.borderColor = hexToRgba(h, 0.15);
+    document.getElementById('breathingRing').style.borderColor = hexToRgba(h, 0.12);
 
-    // Orb — watercolor warmth
+    // Orb — dark center, glow from accent
     document.getElementById('mainCircle').style.background = `
-      radial-gradient(circle at 36% 32%, rgba(255,248,250,0.98) 0%, rgba(${g},0.18) 45%, transparent 72%)
+      radial-gradient(circle at 50% 42%, rgba(${g},0.32) 0%, rgba(${g},0.08) 52%, transparent 74%)
     `;
     document.getElementById('mainCircle').style.boxShadow = `
-      0 0 0 1px rgba(${g},0.2),
-      0 12px 48px rgba(${g},0.14),
-      0 4px 16px rgba(${g},0.08)
+      0 0 0 1px rgba(${g},0.12),
+      0 0 60px rgba(${g},0.22),
+      0 0 120px rgba(${g},0.1)
     `;
 
-    // Volume thumb
-    document.querySelector('input[type="range"]').style.setProperty('--thumb', h);
+    // Ambient body glow update
+    document.body.style.setProperty('--current-glow', g);
 
-    // CTA button — ghost with colored border
+    // CTA button shifts color with stage
     const btn = document.getElementById('ctaButton');
-    btn.style.borderColor   = hexToRgba(h, 0.7);
-    btn.style.background    = 'transparent';
-    btn.style.boxShadow     = 'none';
+    btn.style.background = h;
+    btn.style.borderColor = h;
+    btn.style.color = '#0d1321';
+    btn.style.boxShadow = `0 4px 24px rgba(${g},0.28)`;
 
     // Stage labels
     document.querySelectorAll('.stage-label').forEach((el, i) => {
@@ -745,14 +726,14 @@
       if (elapsed >= s1) {
         fill.style.width      = '100%';
         fill.style.background = stage.accentHex;
-        seg.style.background  = 'rgba(74,69,64,0.07)';
+        seg.style.background  = 'rgba(242,240,236,0.04)';
       } else if (elapsed >= s0) {
         fill.style.width      = ((elapsed - s0) / len * 100) + '%';
         fill.style.background = stage.accentHex;
-        seg.style.background  = 'rgba(74,69,64,0.05)';
+        seg.style.background  = 'rgba(242,240,236,0.04)';
       } else {
         fill.style.width     = '0%';
-        seg.style.background = 'rgba(74,69,64,0.08)';
+        seg.style.background = 'rgba(242,240,236,0.06)';
       }
     });
   }
