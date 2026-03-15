@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>SlowBeat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:ital,wght@0,300;0,400;1,300&family=DM+Mono:wght@400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #faf8f5;
+      --rose:     #e8a4b2;
+      --lavender: #c4b5e8;
+      --sage:     #9ec9c4;
+      --dblue:    #7ba7bc;
+      --stone:    #4a4540;
+      --mid:      #7a7470;
+      --ink:      #a09890;
+      --hairline: rgba(74, 69, 64, 0.1);
+      --serif:    'Cormorant Garamond', Georgia, serif;
+      --sans:     'DM Sans', sans-serif;
+      --mono:     'DM Mono', 'Courier New', monospace;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--stone);
+      font-family: var(--sans);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
+      position: relative;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Warm grain */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 999;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+    }
+
+    /* Ambient blush behind orb */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 38%, rgba(232, 164, 178, 0.08) 0%, transparent 58%);
+      transition: background 3s ease;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── HEADER ──────────────────────────────────────────────────────────── */
+    .header {
+      position: relative;
+      z-index: 1;
+      padding-top: max(28px, env(safe-area-inset-top, 28px));
+      text-align: center;
+    }
+
+    .app-name {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      color: var(--ink);
+    }
+
+    /* Stage badge */
+    .stage-badge {
+      margin-top: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid rgba(232, 164, 178, 0.3);
+      border-radius: 20px;
+      padding: 5px 14px 5px 10px;
+      background: rgba(232, 164, 178, 0.06);
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: 0.06em;
+      color: var(--rose);
+      transition: background 2.5s ease, border-color 2.5s ease, color 2.5s ease;
+    }
+
+    .stage-badge .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--rose);
+      transition: background 2.5s ease;
+      animation: dotPulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes dotPulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.35; }
+    }
+
+    /* ── CENTER ──────────────────────────────────────────────────────────── */
+    .center-stage {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+    }
+
+    /* Breathing ring — behind orb, only visible when running */
+    .breathing-ring {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      border: 1px solid rgba(232, 164, 178, 0.15);
+      opacity: 0;
+      transition: border-color 2.5s ease;
+      pointer-events: none;
+    }
+
+    .running .breathing-ring {
+      opacity: 1;
+      animation: breathe 10s ease-in-out infinite;
+    }
+
+    @keyframes breathe {
+      0%   { transform: scale(1);    opacity: 0.18; }
+      45%  { transform: scale(1.14); opacity: 0.08; }
+      100% { transform: scale(1);    opacity: 0.18; }
+    }
+
+    /* Ripple rings */
+    .ripple-container {
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      pointer-events: none;
+    }
+
+    .ripple {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1px solid rgba(232, 164, 178, 0.4);
+      opacity: 0;
+      transition: border-color 2.5s ease;
+    }
+
+    .ripple.fire {
+      animation: rippleOut 1.1s ease-out forwards;
+    }
+
+    .ripple-2.fire {
+      animation: rippleOut2 1.4s ease-out forwards;
+    }
+
+    @keyframes rippleOut {
+      0%   { transform: scale(1);    opacity: 0.5; }
+      100% { transform: scale(1.65); opacity: 0;   }
+    }
+
+    @keyframes rippleOut2 {
+      0%   { transform: scale(1);    opacity: 0.25; }
+      100% { transform: scale(2.0);  opacity: 0;    }
+    }
+
+    /* Main orb */
+    .main-circle {
+      position: relative;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: box-shadow 2.5s ease, background 2.5s ease;
+      background: radial-gradient(circle at 36% 32%, rgba(255, 248, 250, 0.98) 0%, rgba(232, 164, 178, 0.18) 45%, transparent 72%);
+      box-shadow:
+        0 0 0 1px rgba(232, 164, 178, 0.18),
+        0 12px 48px rgba(232, 164, 178, 0.14),
+        0 4px 16px rgba(232, 164, 178, 0.08);
+    }
+
+    /* Idle: very soft breathing glow */
+    .idle .main-circle {
+      animation: idleBreath 5s ease-in-out infinite;
+    }
+
+    @keyframes idleBreath {
+      0%, 100% {
+        box-shadow:
+          0 0 0 1px rgba(232, 164, 178, 0.15),
+          0 10px 40px rgba(232, 164, 178, 0.1),
+          0 4px 12px rgba(232, 164, 178, 0.06);
+      }
+      50% {
+        box-shadow:
+          0 0 0 1px rgba(232, 164, 178, 0.28),
+          0 16px 60px rgba(232, 164, 178, 0.2),
+          0 6px 20px rgba(232, 164, 178, 0.12);
+      }
+    }
+
+    /* Beat pulse: subtle, like a breath */
+    .main-circle.beat {
+      animation: beatPulse 0.3s ease-out forwards;
+    }
+
+    @keyframes beatPulse {
+      0%   { transform: scale(1); }
+      25%  { transform: scale(1.038); }
+      100% { transform: scale(1); }
+    }
+
+    /* Paused: slightly dimmed */
+    .paused .main-circle {
+      opacity: 0.6;
+    }
+
+    /* BPM number — the centrepiece */
+    .bpm-number {
+      font-family: var(--serif);
+      font-style: italic;
+      font-weight: 600;
+      font-size: 76px;
+      color: var(--rose);
+      line-height: 1;
+      letter-spacing: -0.02em;
+      transition: color 2.5s ease;
+    }
+
+    .bpm-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      color: rgba(232, 164, 178, 0.55);
+      margin-top: 4px;
+      text-transform: uppercase;
+      transition: color 2.5s ease;
+    }
+
+    .time-elapsed {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ink);
+      margin-top: 8px;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── BOTTOM ──────────────────────────────────────────────────────────── */
+    .bottom-section {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 380px;
+      padding: 0 32px;
+      padding-bottom: max(36px, env(safe-area-inset-bottom, 36px));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    /* Progress timeline */
+    .progress-timeline {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .stage-segments {
+      display: flex;
+      gap: 3px;
+      width: 100%;
+      height: 2px;
+    }
+
+    .segment {
+      height: 100%;
+      border-radius: 1px;
+      background: rgba(74, 69, 64, 0.1);
+      position: relative;
+      overflow: hidden;
+      transition: background 0.5s ease;
+    }
+
+    .segment-fill {
+      position: absolute;
+      inset: 0;
+      width: 0%;
+      background: var(--rose);
+      border-radius: 1px;
+      transition: background 2.5s ease;
+    }
+
+    .stage-labels {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .stage-label {
+      font-family: var(--sans);
+      font-size: 9px;
+      font-weight: 300;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--ink);
+      transition: color 0.4s ease;
+    }
+
+    .stage-label.active {
+      color: var(--rose);
+      transition: color 2.5s ease;
+    }
+
+    /* Volume */
+    .volume-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .volume-icon {
+      flex-shrink: 0;
+      color: var(--ink);
+      width: 16px;
+      height: 16px;
+    }
+
+    .volume-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--ink);
+      letter-spacing: 0.08em;
+      flex-shrink: 0;
+      min-width: 40px;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      flex: 1;
+      height: 1px;
+      background: rgba(74, 69, 64, 0.15);
+      border-radius: 1px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--rose);
+      cursor: pointer;
+      border: 2px solid white;
+      box-shadow: 0 1px 6px rgba(232, 164, 178, 0.35);
+      transition: background 2.5s ease;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--rose);
+      cursor: pointer;
+      border: 2px solid white;
+      box-shadow: 0 1px 6px rgba(232, 164, 178, 0.35);
+    }
+
+    /* CTA button */
+    .cta-button {
+      width: 100%;
+      max-width: 260px;
+      padding: 14px 32px;
+      border-radius: 50px;
+      border: 1px solid var(--rose);
+      background: transparent;
+      color: var(--stone);
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 300;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.25s ease, border-color 2.5s ease, color 0.25s ease;
+    }
+
+    .cta-button:hover {
+      background: rgba(232, 164, 178, 0.08);
+    }
+
+    .cta-button:active {
+      transform: scale(0.98);
+    }
+
+    /* Tagline */
+    .tagline {
+      text-align: center;
+      font-family: var(--sans);
+      font-weight: 300;
+      font-style: italic;
+      font-size: 10px;
+      color: var(--ink);
+      line-height: 1.65;
+      letter-spacing: 0.02em;
+      max-width: 280px;
+    }
+
+    /* Stage color classes (body-level, for CSS cascade) */
+    .color-rose     { --current: var(--rose);     }
+    .color-lavender { --current: var(--lavender);  }
+    .color-sage     { --current: var(--sage);      }
+    .color-dblue    { --current: var(--dblue);     }
+
+    /* Larger screens */
+    @media (min-height: 800px) {
+      .main-circle      { width: 260px; height: 260px; }
+      .ripple-container { width: 260px; height: 260px; }
+      .bpm-number       { font-size: 84px; }
+    }
+
+    @media (min-width: 600px) {
+      .main-circle      { width: 270px; height: 270px; }
+      .ripple-container { width: 270px; height: 270px; }
+      .bpm-number       { font-size: 88px; }
+      .cta-button       { max-width: 300px; }
+    }
+  </style>
+</head>
+<body class="idle color-rose" id="appRoot">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="app-name">SlowBeat</div>
+    <div class="stage-badge" id="stageBadge">
+      <span class="dot" id="stageDot"></span>
+      <span id="stageText">Awake</span>
+    </div>
+  </header>
+
+  <!-- CENTER -->
+  <main class="center-stage">
+    <div class="breathing-ring" id="breathingRing"></div>
+
+    <div class="ripple-container" id="rippleContainer">
+      <div class="ripple ripple-1" id="ripple1"></div>
+      <div class="ripple ripple-2" id="ripple2"></div>
+    </div>
+
+    <div class="main-circle" id="mainCircle">
+      <div class="bpm-number" id="bpmDisplay">65</div>
+      <div class="bpm-label">BPM</div>
+      <div class="time-elapsed" id="timeElapsed">0:00</div>
+    </div>
+  </main>
+
+  <!-- BOTTOM -->
+  <section class="bottom-section">
+
+    <div class="progress-timeline">
+      <div class="stage-segments" id="stageSegments">
+        <div class="segment" id="seg-0" style="flex: 5"><div class="segment-fill" id="fill-0"></div></div>
+        <div class="segment" id="seg-1" style="flex: 7"><div class="segment-fill" id="fill-1"></div></div>
+        <div class="segment" id="seg-2" style="flex: 10"><div class="segment-fill" id="fill-2"></div></div>
+        <div class="segment" id="seg-3" style="flex: 8"><div class="segment-fill" id="fill-3"></div></div>
+      </div>
+      <div class="stage-labels">
+        <span class="stage-label active" id="lbl-0">Awake</span>
+        <span class="stage-label" id="lbl-1">Drifting</span>
+        <span class="stage-label" id="lbl-2">Light Sleep</span>
+        <span class="stage-label" id="lbl-3">Deep Sleep</span>
+      </div>
+    </div>
+
+    <div class="volume-row">
+      <svg class="volume-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+      </svg>
+      <span class="volume-label">Volume</span>
+      <input type="range" id="volumeSlider" min="0" max="100" value="75" />
+    </div>
+
+    <button class="cta-button" id="ctaButton">Begin Sleep Journey</button>
+
+    <p class="tagline">Auditory entrainment aligned with your natural cardiac rhythm</p>
+
+  </section>
+
+<script>
+(function () {
+  'use strict';
+
+  // ── STAGE DEFINITIONS ─────────────────────────────────────────────────────
+  // Soft palette: rose → lavender → sage → dusty blue
+  const STAGES = [
+    { name: 'Awake',       startMin: 0,  endMin: 5,  startBpm: 65, endBpm: 60, colorClass: 'color-rose',     accentHex: '#e8a4b2', glowRgba: '232,164,178' },
+    { name: 'Drifting',    startMin: 5,  endMin: 12, startBpm: 60, endBpm: 55, colorClass: 'color-lavender', accentHex: '#c4b5e8', glowRgba: '196,181,232' },
+    { name: 'Light Sleep', startMin: 12, endMin: 22, startBpm: 55, endBpm: 50, colorClass: 'color-sage',     accentHex: '#9ec9c4', glowRgba: '158,201,196' },
+    { name: 'Deep Sleep',  startMin: 22, endMin: 30, startBpm: 50, endBpm: 45, colorClass: 'color-dblue',    accentHex: '#7ba7bc', glowRgba: '123,167,188' },
+    { name: 'Sleeping',    startMin: 30, endMin: 35, startBpm: 45, endBpm: 45, colorClass: 'color-dblue',    accentHex: '#a8b8c0', glowRgba: '168,184,192' },
+  ];
+
+  const FADE_START_SECONDS = 30 * 60;
+  const FADE_END_SECONDS   = 35 * 60;
+
+  // ── STATE ─────────────────────────────────────────────────────────────────
+  let appState        = 'idle';
+  let elapsed         = 0;
+  let currentBpm      = 65;
+  let currentStageIdx = 0;
+  let beatTimer       = null;
+  let clockTimer      = null;
+
+  // ── AUDIO ─────────────────────────────────────────────────────────────────
+  let audioCtx   = null;
+  let masterGain = null;
+
+  function ensureAudioCtx() {
+    if (!audioCtx) {
+      audioCtx   = new (window.AudioContext || window.webkitAudioContext)();
+      masterGain = audioCtx.createGain();
+      masterGain.gain.value = getVolume();
+      masterGain.connect(audioCtx.destination);
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function getVolume() {
+    return document.getElementById('volumeSlider').value / 100 * 0.9;
+  }
+
+  function playLubDub() {
+    if (!audioCtx || appState !== 'running') return;
+    const now = audioCtx.currentTime;
+    playThud(now,        80, 0.105, 0.0015, 0.095, 1.0);
+    playThud(now + 0.22, 60, 0.09,  0.001,  0.075, 0.72);
+  }
+
+  function playThud(startTime, freq, duration, attack, decay, gainMult) {
+    const osc      = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    const filter   = audioCtx.createBiquadFilter();
+
+    osc.type            = 'sine';
+    osc.frequency.value = freq;
+    filter.type            = 'lowpass';
+    filter.frequency.value = 180;
+    filter.Q.value         = 1.8;
+
+    gainNode.gain.setValueAtTime(0, startTime);
+    gainNode.gain.linearRampToValueAtTime(gainMult * 0.9, startTime + attack);
+    gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + attack + decay);
+
+    osc.connect(filter);
+    filter.connect(gainNode);
+    gainNode.connect(masterGain);
+
+    osc.start(startTime);
+    osc.stop(startTime + duration);
+    osc.onended = () => { try { osc.disconnect(); filter.disconnect(); gainNode.disconnect(); } catch(e){} };
+  }
+
+  // ── BPM CALC ──────────────────────────────────────────────────────────────
+  function calcBpm(sec) {
+    for (let i = 0; i < STAGES.length; i++) {
+      const s = STAGES[i];
+      const s0 = s.startMin * 60, s1 = s.endMin * 60;
+      if (sec >= s0 && sec < s1) {
+        const t = (sec - s0) / (s1 - s0);
+        return s.startBpm + (s.endBpm - s.startBpm) * t;
+      }
+    }
+    return 45;
+  }
+
+  function getCurrentStageIdx(sec) {
+    if (sec >= FADE_END_SECONDS) return STAGES.length - 1;
+    for (let i = 0; i < STAGES.length; i++) {
+      if (sec < STAGES[i].endMin * 60) return i;
+    }
+    return STAGES.length - 1;
+  }
+
+  // ── BEAT LOOP ─────────────────────────────────────────────────────────────
+  function scheduleBeat() {
+    if (appState !== 'running') return;
+    const bpm      = calcBpm(elapsed);
+    const interval = (60 / bpm) * 1000;
+    playLubDub();
+    triggerVisualBeat();
+    beatTimer = setTimeout(scheduleBeat, interval);
+  }
+
+  function triggerVisualBeat() {
+    const circle = document.getElementById('mainCircle');
+    const r1 = document.getElementById('ripple1');
+    const r2 = document.getElementById('ripple2');
+
+    circle.classList.remove('beat');
+    void circle.offsetWidth;
+    circle.classList.add('beat');
+
+    r1.classList.remove('fire');
+    r2.classList.remove('fire');
+    void r1.offsetWidth;
+    r1.classList.add('fire');
+    r2.classList.add('fire');
+  }
+
+  // ── CLOCK ─────────────────────────────────────────────────────────────────
+  function startClock() {
+    clearInterval(clockTimer);
+    clockTimer = setInterval(() => {
+      if (appState !== 'running') return;
+      elapsed++;
+      updateUI();
+    }, 1000);
+  }
+
+  function updateUI() {
+    const bpm      = calcBpm(elapsed);
+    currentBpm     = bpm;
+    const stageIdx = getCurrentStageIdx(elapsed);
+    const changed  = stageIdx !== currentStageIdx;
+    currentStageIdx = stageIdx;
+
+    // Fade out after deep sleep (REM micro-arousal prevention)
+    if (masterGain && elapsed >= FADE_START_SECONDS) {
+      const progress  = Math.min(1, (elapsed - FADE_START_SECONDS) / (FADE_END_SECONDS - FADE_START_SECONDS));
+      const targetGain = getVolume() * (1 - progress);
+      masterGain.gain.setTargetAtTime(targetGain, audioCtx.currentTime, 0.5);
+      if (progress >= 1) {
+        clearTimeout(beatTimer);
+        clearInterval(clockTimer);
+        appState = 'sleeping';
+        document.getElementById('stageText').textContent  = 'Sleeping';
+        document.getElementById('ctaButton').textContent  = 'End Session';
+        document.getElementById('bpmDisplay').textContent = '♥';
+        return;
+      }
+    }
+
+    document.getElementById('bpmDisplay').textContent = Math.round(bpm);
+
+    const m = Math.floor(elapsed / 60);
+    const s = elapsed % 60;
+    document.getElementById('timeElapsed').textContent = `${m}:${s.toString().padStart(2, '0')}`;
+
+    if (changed) applyStageColor(stageIdx);
+    updateProgressBar();
+  }
+
+  function applyStageColor(idx) {
+    const root  = document.getElementById('appRoot');
+    const badge = document.getElementById('stageBadge');
+    const dot   = document.getElementById('stageDot');
+    const bpmNum = document.getElementById('bpmDisplay');
+    const stage = STAGES[idx];
+    const h = stage.accentHex;
+    const g = stage.glowRgba;
+
+    STAGES.forEach(s => root.classList.remove(s.colorClass));
+    root.classList.add(stage.colorClass);
+
+    // Stage badge — soft fill
+    badge.style.background   = hexToRgba(h, 0.07);
+    badge.style.borderColor  = hexToRgba(h, 0.28);
+    badge.style.color        = h;
+    dot.style.background     = h;
+    document.getElementById('stageText').textContent = stage.name;
+
+    // BPM number & label
+    bpmNum.style.color = h;
+    document.querySelector('.bpm-label').style.color = hexToRgba(h, 0.5);
+
+    // Ripples — thin, soft
+    document.getElementById('ripple1').style.borderColor = hexToRgba(h, 0.42);
+    document.getElementById('ripple2').style.borderColor = hexToRgba(h, 0.22);
+
+    // Breathing ring
+    document.getElementById('breathingRing').style.borderColor = hexToRgba(h, 0.15);
+
+    // Orb — watercolor warmth
+    document.getElementById('mainCircle').style.background = `
+      radial-gradient(circle at 36% 32%, rgba(255,248,250,0.98) 0%, rgba(${g},0.18) 45%, transparent 72%)
+    `;
+    document.getElementById('mainCircle').style.boxShadow = `
+      0 0 0 1px rgba(${g},0.2),
+      0 12px 48px rgba(${g},0.14),
+      0 4px 16px rgba(${g},0.08)
+    `;
+
+    // Volume thumb
+    document.querySelector('input[type="range"]').style.setProperty('--thumb', h);
+
+    // CTA button — ghost with colored border
+    const btn = document.getElementById('ctaButton');
+    btn.style.borderColor   = hexToRgba(h, 0.7);
+    btn.style.background    = 'transparent';
+    btn.style.boxShadow     = 'none';
+
+    // Stage labels
+    document.querySelectorAll('.stage-label').forEach((el, i) => {
+      el.classList.toggle('active', i === idx);
+      el.style.color = (i === idx) ? h : '';
+    });
+  }
+
+  function updateProgressBar() {
+    STAGES.forEach((stage, i) => {
+      const s0   = stage.startMin * 60;
+      const s1   = stage.endMin   * 60;
+      const len  = s1 - s0;
+      const fill = document.getElementById(`fill-${i}`);
+      const seg  = document.getElementById(`seg-${i}`);
+      if (!fill || !seg) return;
+
+      if (elapsed >= s1) {
+        fill.style.width      = '100%';
+        fill.style.background = stage.accentHex;
+        seg.style.background  = 'rgba(74,69,64,0.07)';
+      } else if (elapsed >= s0) {
+        fill.style.width      = ((elapsed - s0) / len * 100) + '%';
+        fill.style.background = stage.accentHex;
+        seg.style.background  = 'rgba(74,69,64,0.05)';
+      } else {
+        fill.style.width     = '0%';
+        seg.style.background = 'rgba(74,69,64,0.08)';
+      }
+    });
+  }
+
+  // ── CONTROLS ──────────────────────────────────────────────────────────────
+  function startSession() {
+    ensureAudioCtx();
+    appState = 'running';
+    setBodyState('running');
+    document.getElementById('ctaButton').textContent = 'Pause';
+    startClock();
+    scheduleBeat();
+    updateUI();
+  }
+
+  function pauseSession() {
+    appState = 'paused';
+    setBodyState('paused');
+    clearTimeout(beatTimer);
+    clearInterval(clockTimer);
+    document.getElementById('ctaButton').textContent = 'Resume';
+  }
+
+  function resumeSession() {
+    ensureAudioCtx();
+    appState = 'running';
+    setBodyState('running');
+    document.getElementById('ctaButton').textContent = 'Pause';
+    startClock();
+    scheduleBeat();
+  }
+
+  function setBodyState(state) {
+    const root = document.getElementById('appRoot');
+    root.classList.remove('idle', 'running', 'paused');
+    root.classList.add(state);
+  }
+
+  // ── BUTTON ────────────────────────────────────────────────────────────────
+  document.getElementById('ctaButton').addEventListener('click', () => {
+    if (appState === 'idle')     return startSession();
+    if (appState === 'running')  return pauseSession();
+    if (appState === 'paused')   return resumeSession();
+    if (appState === 'sleeping') {
+      elapsed = 0; currentStageIdx = 0; appState = 'idle';
+      setBodyState('idle');
+      if (masterGain) masterGain.gain.setTargetAtTime(getVolume(), audioCtx.currentTime, 0.1);
+      document.getElementById('ctaButton').textContent  = 'Begin Sleep Journey';
+      document.getElementById('bpmDisplay').textContent = '65';
+      applyStageColor(0);
+      updateProgressBar();
+    }
+  });
+
+  // ── VOLUME ────────────────────────────────────────────────────────────────
+  document.getElementById('volumeSlider').addEventListener('input', () => {
+    if (masterGain) masterGain.gain.setTargetAtTime(getVolume(), audioCtx.currentTime, 0.05);
+  });
+
+  // ── HELPERS ───────────────────────────────────────────────────────────────
+  function hexToRgba(hex, alpha) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
+
+  // ── INIT ──────────────────────────────────────────────────────────────────
+  applyStageColor(0);
+  updateProgressBar();
+
+})();
+</script>
+</body>
+</html>

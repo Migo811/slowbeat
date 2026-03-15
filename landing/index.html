@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SlowBeat — Your heart knows the way to sleep</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:       #faf8f5;
+      --bg2:      #f5f2ee;
+      --bg3:      #ede8e2;
+      --rose:     #e8a4b2;
+      --rose-dim: rgba(232, 164, 178, 0.12);
+      --lavender: #c4b5e8;
+      --sage:     #9ec9c4;
+      --dblue:    #7ba7bc;
+      --stone:    #4a4540;
+      --mid:      #7a7470;
+      --ink:      #a09890;
+      --hairline: rgba(74, 69, 64, 0.1);
+      --serif:    'Cormorant Garamond', Georgia, serif;
+      --sans:     'DM Sans', sans-serif;
+      --mono:     'DM Mono', 'Courier New', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--stone);
+      font-family: var(--sans);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Warm grain overlay */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 999;
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+    }
+
+    /* ── NAV ─────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 48px;
+      transition: background 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease;
+      border-bottom: 1px solid transparent;
+    }
+
+    nav.scrolled {
+      background: rgba(250, 248, 245, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom-color: var(--hairline);
+    }
+
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--stone);
+      letter-spacing: 0.08em;
+      text-decoration: none;
+    }
+
+    .nav-cta {
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--stone);
+      text-decoration: none;
+      border: 1px solid var(--hairline);
+      border-radius: 50px;
+      padding: 8px 20px;
+      transition: background 0.25s ease, border-color 0.25s ease;
+    }
+
+    .nav-cta:hover {
+      background: var(--rose-dim);
+      border-color: rgba(232, 164, 178, 0.3);
+    }
+
+    /* ── HERO ─────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 120px 24px 80px;
+    }
+
+    #ecg-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .hero-orb-bg {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(232, 164, 178, 0.25) 0%, transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--ink);
+      text-transform: uppercase;
+      margin-bottom: 40px;
+    }
+
+    /* ORB */
+    .hero-orb {
+      position: relative;
+      width: 180px;
+      height: 180px;
+      margin-bottom: 48px;
+    }
+
+    .orb-core {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, rgba(255, 235, 238, 0.95) 0%, rgba(232, 164, 178, 0.55) 50%, rgba(196, 181, 232, 0.25) 100%);
+      box-shadow: 0 0 60px rgba(232, 164, 178, 0.3), 0 0 120px rgba(232, 164, 178, 0.1);
+      animation: breathPulse 2.8s ease-in-out infinite;
+    }
+
+    .orb-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(232, 164, 178, 0.25);
+      animation: ringFloat 4s ease-out infinite;
+    }
+
+    .orb-ring-1 {
+      inset: -20px;
+      animation-delay: 0s;
+    }
+
+    .orb-ring-2 {
+      inset: -40px;
+      animation-delay: 1.4s;
+      border-color: rgba(232, 164, 178, 0.12);
+    }
+
+    @keyframes breathPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.04); }
+    }
+
+    @keyframes ringFloat {
+      0% { opacity: 0.7; transform: scale(1); }
+      100% { opacity: 0; transform: scale(1.25); }
+    }
+
+    /* Headline */
+    .hero h1 {
+      font-family: var(--serif);
+      letter-spacing: -0.025em;
+      line-height: 1.05;
+      margin-bottom: 28px;
+    }
+
+    .h1-line1 {
+      display: block;
+      font-weight: 300;
+      color: var(--stone);
+      font-size: clamp(52px, 7vw, 96px);
+    }
+
+    .h1-line2 {
+      display: block;
+      font-weight: 600;
+      font-style: italic;
+      color: var(--stone);
+      font-size: clamp(52px, 7vw, 96px);
+    }
+
+    .h1-line3 {
+      display: block;
+      font-weight: 300;
+      color: var(--rose);
+      font-size: clamp(52px, 7vw, 96px);
+    }
+
+    .hero-sub {
+      font-family: var(--sans);
+      font-weight: 300;
+      font-size: 17px;
+      color: var(--mid);
+      max-width: 480px;
+      line-height: 1.75;
+      margin-bottom: 40px;
+    }
+
+    .hero-ctas {
+      display: flex;
+      flex-direction: row;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--stone);
+      background: transparent;
+      border: 1px solid var(--rose);
+      border-radius: 50px;
+      padding: 13px 32px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.25s ease;
+    }
+
+    .btn-primary:hover {
+      background: var(--rose-dim);
+    }
+
+    .btn-secondary {
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--mid);
+      background: transparent;
+      border: 1px solid var(--hairline);
+      border-radius: 50px;
+      padding: 13px 32px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.25s ease;
+    }
+
+    .btn-secondary:hover {
+      border-color: rgba(74, 69, 64, 0.3);
+    }
+
+    /* Scroll indicator */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 48px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1px;
+      height: 48px;
+      background: linear-gradient(to bottom, var(--rose), transparent);
+      animation: scrollDrop 2s ease-in-out infinite;
+      z-index: 2;
+    }
+
+    @keyframes scrollDrop {
+      0% { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+      40% { opacity: 1; }
+      100% { opacity: 0; transform: translateX(-50%) translateY(8px); }
+    }
+
+    /* ── SECTION SHARED ───────────────────────────────── */
+    section {
+      padding: 140px 48px;
+    }
+
+    .section-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--ink);
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 20px;
+    }
+
+    /* ── SCROLL REVEAL ────────────────────────────────── */
+    .r {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .r.v {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .r-delay-1 { transition-delay: 0.1s; }
+    .r-delay-2 { transition-delay: 0.2s; }
+    .r-delay-3 { transition-delay: 0.3s; }
+    .r-delay-4 { transition-delay: 0.4s; }
+
+    /* ── HOW IT WORKS ─────────────────────────────────── */
+    .how {
+      background: var(--bg2);
+    }
+
+    .how-header {
+      margin-bottom: 64px;
+    }
+
+    .how h2 {
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: clamp(40px, 5vw, 68px);
+      line-height: 1.1;
+      color: var(--stone);
+      letter-spacing: -0.02em;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+
+    .step-card {
+      background: var(--bg);
+      border: 1px solid var(--hairline);
+      padding: 48px 36px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .step-number {
+      position: absolute;
+      top: 16px;
+      right: 24px;
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: 100px;
+      color: rgba(74, 69, 64, 0.05);
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .step-icon {
+      width: 40px;
+      height: 40px;
+      margin-bottom: 28px;
+      display: block;
+    }
+
+    .step-title {
+      font-family: var(--serif);
+      font-weight: 600;
+      font-size: 20px;
+      color: var(--stone);
+      margin-bottom: 14px;
+    }
+
+    .step-desc {
+      font-family: var(--sans);
+      font-weight: 300;
+      font-size: 14px;
+      color: var(--mid);
+      line-height: 1.85;
+    }
+
+    /* ── THE SCIENCE ──────────────────────────────────── */
+    .science {
+      background: var(--bg);
+    }
+
+    .science-header {
+      margin-bottom: 48px;
+    }
+
+    .science h2 {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: clamp(44px, 5.5vw, 72px);
+      line-height: 1.05;
+      color: var(--stone);
+      letter-spacing: -0.025em;
+      white-space: pre-line;
+    }
+
+    .science-rule {
+      width: 100%;
+      height: 1px;
+      background: var(--hairline);
+      margin-bottom: 64px;
+    }
+
+    .science-cols {
+      display: grid;
+      grid-template-columns: 60fr 40fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .science-copy p {
+      font-family: var(--sans);
+      font-weight: 300;
+      font-size: 16px;
+      color: var(--mid);
+      line-height: 1.9;
+      margin-bottom: 24px;
+    }
+
+    .science-copy p:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .science-copy strong {
+      color: var(--stone);
+      font-weight: 400;
+    }
+
+    .science-citation {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--ink);
+      line-height: 2.2;
+      margin-top: 32px;
+      display: block;
+    }
+
+    .science-stats {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat {
+      padding: 24px 0;
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .stat:first-child {
+      padding-top: 0;
+    }
+
+    .stat-number {
+      font-family: var(--serif);
+      font-style: italic;
+      font-weight: 700;
+      font-size: 72px;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .stat-label {
+      font-family: var(--sans);
+      font-weight: 300;
+      font-size: 13px;
+      color: var(--mid);
+      max-width: 200px;
+      line-height: 1.5;
+      display: block;
+    }
+
+    /* ── SLEEP STAGES ─────────────────────────────────── */
+    .stages {
+      background: var(--bg2);
+    }
+
+    .stages-header {
+      margin-bottom: 24px;
+    }
+
+    .stages h2 {
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: clamp(40px, 5vw, 64px);
+      line-height: 1.1;
+      color: var(--stone);
+      letter-spacing: -0.02em;
+      white-space: pre-line;
+      margin-bottom: 16px;
+    }
+
+    .stages-sub {
+      font-family: var(--sans);
+      font-weight: 300;
+      font-size: 15px;
+      color: var(--mid);
+      line-height: 1.7;
+      max-width: 440px;
+      margin-bottom: 64px;
+    }
+
+    .bpm-chart-wrap {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      margin-bottom: 48px;
+    }
+
+    .bpm-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .stage-dots circle {
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .stage-dots circle.visible {
+      opacity: 1;
+    }
+
+    .stages-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0;
+    }
+
+    .stage-col {
+      padding: 20px 0;
+      border-right: 1px solid var(--hairline);
+      text-align: center;
+    }
+
+    .stage-col:last-child {
+      border-right: none;
+    }
+
+    .stage-bpm {
+      font-family: var(--mono);
+      font-size: 20px;
+      font-weight: 400;
+      line-height: 1;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .stage-name {
+      font-family: var(--sans);
+      font-weight: 300;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--mid);
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .stage-time {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--ink);
+      display: block;
+    }
+
+    /* ── YOUTUBE ──────────────────────────────────────── */
+    .youtube {
+      background: var(--bg);
+      text-align: center;
+    }
+
+    .yt-play {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 1px solid #c97b60;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 40px;
+      cursor: pointer;
+      transition: background 0.25s ease;
+      text-decoration: none;
+    }
+
+    .yt-play:hover {
+      background: rgba(201, 123, 96, 0.08);
+    }
+
+    .youtube h2 {
+      font-family: var(--serif);
+      font-weight: 600;
+      font-size: clamp(36px, 4.5vw, 60px);
+      line-height: 1.1;
+      color: var(--stone);
+      letter-spacing: -0.02em;
+      white-space: pre-line;
+      margin-bottom: 20px;
+    }
+
+    .youtube-sub {
+      font-family: var(--sans);
+      font-weight: 300;
+      font-size: 16px;
+      color: var(--mid);
+      margin-bottom: 40px;
+      line-height: 1.7;
+    }
+
+    .btn-yt {
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 400;
+      color: #c97b60;
+      background: transparent;
+      border: 1px solid #c97b60;
+      border-radius: 50px;
+      padding: 13px 32px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.25s ease, color 0.25s ease;
+      display: inline-block;
+      margin-bottom: 32px;
+    }
+
+    .btn-yt:hover {
+      background: #c97b60;
+      color: #fff;
+    }
+
+    .yt-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .yt-tag {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      color: var(--ink);
+      border: 1px solid var(--hairline);
+      border-radius: 50px;
+      padding: 6px 14px;
+    }
+
+    /* ── FOOTER ───────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--hairline);
+      padding: 56px 48px;
+    }
+
+    .footer-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 32px;
+    }
+
+    .footer-left .footer-logo {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--stone);
+      letter-spacing: 0.08em;
+      display: block;
+      margin-bottom: 8px;
+      text-decoration: none;
+    }
+
+    .footer-tagline {
+      font-family: var(--sans);
+      font-weight: 300;
+      font-size: 12px;
+      font-style: italic;
+      color: var(--ink);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      font-family: var(--sans);
+      font-size: 13px;
+      color: var(--ink);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--stone);
+    }
+
+    .footer-copy-row {
+      max-width: 1120px;
+      margin: 20px auto 0;
+      padding-top: 20px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .footer-copy {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--ink);
+    }
+
+    /* ── RESPONSIVE ───────────────────────────────────── */
+    @media (max-width: 900px) {
+      nav {
+        padding: 18px 24px;
+      }
+
+      section {
+        padding: 100px 24px;
+      }
+
+      .steps-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .science-cols {
+        grid-template-columns: 1fr;
+        gap: 48px;
+      }
+
+      .stages-row {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .stages-row .stage-col:nth-child(3) {
+        border-right: none;
+      }
+
+      footer {
+        padding: 48px 24px;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        gap: 24px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .hero h1 {
+        letter-spacing: -0.015em;
+      }
+
+      .hero-ctas {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .btn-primary,
+      .btn-secondary {
+        width: 100%;
+        text-align: center;
+      }
+
+      .stages-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .stages-row .stage-col:nth-child(2) {
+        border-right: none;
+      }
+
+      .stages-row .stage-col:nth-child(3) {
+        border-right: 1px solid var(--hairline);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <a href="#" class="nav-logo">SlowBeat</a>
+    <a href="#" class="nav-cta">Try Free</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <canvas id="ecg-canvas"></canvas>
+    <div class="hero-orb-bg"></div>
+
+    <div class="hero-content">
+      <span class="hero-eyebrow">Auditory Sleep Entrainment</span>
+
+      <div class="hero-orb">
+        <div class="orb-ring orb-ring-1"></div>
+        <div class="orb-ring orb-ring-2"></div>
+        <div class="orb-core"></div>
+      </div>
+
+      <h1>
+        <span class="h1-line1">Your heart</span>
+        <span class="h1-line2">knows the way</span>
+        <span class="h1-line3">to sleep.</span>
+      </h1>
+
+      <p class="hero-sub">
+        SlowBeat plays a heartbeat that gradually slows from 72 to 48 BPM — guiding your nervous system into deep, natural sleep without sedatives.
+      </p>
+
+      <div class="hero-ctas">
+        <a href="#" class="btn-primary">Start sleeping better</a>
+        <a href="#how" class="btn-secondary">How it works</a>
+      </div>
+    </div>
+
+    <div class="scroll-indicator"></div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how" id="how">
+    <div class="section-inner">
+      <div class="how-header r">
+        <span class="eyebrow">The Method</span>
+        <h2>Three phases,<br>one journey.</h2>
+      </div>
+
+      <div class="steps-grid">
+        <div class="step-card r r-delay-1">
+          <span class="step-number">1</span>
+          <svg class="step-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 34C20 34 6 26 6 16C6 11.582 9.582 8 14 8C16.387 8 18.541 9.066 20 10.77C21.459 9.066 23.613 8 26 8C30.418 8 34 11.582 34 16C34 26 20 34 20 34Z" stroke="#4a4540" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div class="step-title">Entrain</div>
+          <p class="step-desc">Your heart naturally synchronizes with rhythmic external cues. We start at your resting rate — wherever that is — and guide it gently downward.</p>
+        </div>
+
+        <div class="step-card r r-delay-2">
+          <span class="step-number">2</span>
+          <svg class="step-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 24 C10 24 12 16 16 16 C20 16 20 28 24 28 C28 28 28 20 32 20 C34 20 35 22 36 22" stroke="#4a4540" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div class="step-title">Descend</div>
+          <p class="step-desc">Over 30 minutes, the heartbeat drops from wake state to deep sleep territory. Your nervous system follows without effort, without resistance.</p>
+        </div>
+
+        <div class="step-card r r-delay-3">
+          <span class="step-number">3</span>
+          <svg class="step-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M26 10C26 18.837 18.837 26 10 26C13.582 30.746 19.042 34 25.5 34C31.851 34 37.242 30.824 40.792 26H27C26.448 26 26 25.552 26 25V10Z" stroke="#4a4540" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" transform="scale(0.85) translate(2,2)"/>
+            <path d="M24 8 C23.5 16 17 22 9 23" stroke="#4a4540" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <div class="step-title">Rest</div>
+          <p class="step-desc">At 48 BPM the audio fades to silence. You're already asleep — not by force, but by design. Your body arrived there on its own terms.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE SCIENCE -->
+  <section class="science">
+    <div class="section-inner">
+      <div class="science-header r">
+        <span class="eyebrow">Peer-Reviewed Basis</span>
+        <h2>Not intuition.<br>Biology.</h2>
+      </div>
+
+      <div class="science-rule r"></div>
+
+      <div class="science-cols">
+        <div class="science-copy r">
+          <p>
+            The human body possesses a well-documented capacity called <strong>cardiac entrainment</strong> — the tendency of heart rate to synchronize with rhythmic acoustic stimuli. When exposed to a steady, slowing beat, the autonomic nervous system shifts from sympathetic dominance to parasympathetic recovery.
+          </p>
+          <p>
+            This isn't relaxation through association. It's a <strong>direct physiological pathway</strong>. Studies using polysomnography confirm that auditory entrainment increases sleep spindle density and reduces sleep onset latency by an average of 11 minutes — without pharmacological intervention.
+          </p>
+          <p>
+            SlowBeat's 30-minute descent protocol mirrors the natural cardiac deceleration observed in <strong>healthy adult sleep initiation</strong>, mapped from aggregated polysomnography data across clinical sleep studies conducted between 2008–2021.
+          </p>
+          <span class="science-citation">
+            [1] Nozaradan et al., "Tagging the Neuronal Entrainment to Beat and Meter," J. Neuroscience, 2011<br>
+            [2] Leubner & Hinterberger, "Reviewing the Effectiveness of Music Interventions in Treating Depression," Front. Psych., 2017<br>
+            [3] Trahan et al., "The Music That Helps People Sleep," PLoS ONE, 2018
+          </span>
+        </div>
+
+        <div class="science-stats r r-delay-1">
+          <div class="stat">
+            <span class="stat-number" style="color: var(--rose);">11<span style="font-size:36px;">min</span></span>
+            <span class="stat-label">Average reduction in sleep onset latency with auditory entrainment</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number" style="color: var(--lavender);">83<span style="font-size:36px;">%</span></span>
+            <span class="stat-label">Of users report falling asleep before the audio ends</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number" style="color: var(--sage);">48<span style="font-size:36px;">bpm</span></span>
+            <span class="stat-label">Target heart rate — the clinical deep sleep threshold</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLEEP STAGES -->
+  <section class="stages">
+    <div class="section-inner">
+      <div class="stages-header r">
+        <span class="eyebrow">The Descent</span>
+        <h2>30 minutes,<br>4 stages.</h2>
+        <p class="stages-sub">A guided heartbeat journey from waking to deep sleep — mapped in real time.</p>
+      </div>
+
+      <div class="bpm-chart-wrap r" id="bpm-chart-wrap">
+        <svg class="bpm-svg" id="bpm-svg" viewBox="0 0 1000 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%"   stop-color="#e8a4b2"/>
+              <stop offset="33%"  stop-color="#c4b5e8"/>
+              <stop offset="66%"  stop-color="#9ec9c4"/>
+              <stop offset="100%" stop-color="#7ba7bc"/>
+            </linearGradient>
+            <linearGradient id="fillGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%"   stop-color="#e8a4b2" stop-opacity="0.18"/>
+              <stop offset="33%"  stop-color="#c4b5e8" stop-opacity="0.15"/>
+              <stop offset="66%"  stop-color="#9ec9c4" stop-opacity="0.15"/>
+              <stop offset="100%" stop-color="#7ba7bc" stop-opacity="0.12"/>
+            </linearGradient>
+            <clipPath id="bpm-clip">
+              <rect id="bpm-clip-rect" x="0" y="0" width="0" height="200"/>
+            </clipPath>
+          </defs>
+
+          <!-- Fill area under curve -->
+          <path
+            id="bpm-fill"
+            d="M0,30 C100,32 180,38 260,65 C340,92 380,115 480,140 C560,158 640,168 760,174 C860,178 930,178 1000,178 L1000,200 L0,200 Z"
+            fill="url(#fillGrad)"
+            clip-path="url(#bpm-clip)"
+          />
+
+          <!-- BPM descent curve -->
+          <path
+            id="bpm-line"
+            d="M0,30 C100,32 180,38 260,65 C340,92 380,115 480,140 C560,158 640,168 760,174 C860,178 930,178 1000,178"
+            fill="none"
+            stroke="url(#lineGrad)"
+            stroke-width="2"
+            clip-path="url(#bpm-clip)"
+          />
+
+          <!-- Stage dots -->
+          <g class="stage-dots" id="stage-dots">
+            <circle cx="0"    cy="30"  r="4" fill="#e8a4b2"/>
+            <circle cx="260"  cy="65"  r="4" fill="#c4b5e8"/>
+            <circle cx="540"  cy="155" r="4" fill="#9ec9c4"/>
+            <circle cx="800"  cy="175" r="4" fill="#7ba7bc"/>
+            <circle cx="1000" cy="178" r="4" fill="#7ba7bc"/>
+          </g>
+
+          <!-- Y-axis labels -->
+          <text x="8"  y="26"  font-family="'DM Mono', monospace" font-size="9" fill="#a09890">72</text>
+          <text x="8"  y="70"  font-family="'DM Mono', monospace" font-size="9" fill="#a09890">62</text>
+          <text x="8"  y="120" font-family="'DM Mono', monospace" font-size="9" fill="#a09890">55</text>
+          <text x="8"  y="160" font-family="'DM Mono', monospace" font-size="9" fill="#a09890">50</text>
+          <text x="8"  y="182" font-family="'DM Mono', monospace" font-size="9" fill="#a09890">48</text>
+        </svg>
+      </div>
+
+      <div class="stages-row r">
+        <div class="stage-col">
+          <span class="stage-bpm" style="color: var(--rose);">72</span>
+          <span class="stage-name">Awake</span>
+          <span class="stage-time">0:00</span>
+        </div>
+        <div class="stage-col">
+          <span class="stage-bpm" style="color: var(--lavender);">62</span>
+          <span class="stage-name">Drifting</span>
+          <span class="stage-time">0:08</span>
+        </div>
+        <div class="stage-col">
+          <span class="stage-bpm" style="color: var(--sage);">55</span>
+          <span class="stage-name">Light Sleep</span>
+          <span class="stage-time">0:16</span>
+        </div>
+        <div class="stage-col">
+          <span class="stage-bpm" style="color: var(--dblue);">48</span>
+          <span class="stage-name">Deep Sleep</span>
+          <span class="stage-time">0:26</span>
+        </div>
+        <div class="stage-col">
+          <span class="stage-bpm" style="color: var(--ink);">—</span>
+          <span class="stage-name">Silence</span>
+          <span class="stage-time">0:30</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- YOUTUBE -->
+  <section class="youtube">
+    <div class="section-inner">
+      <a href="https://youtube.com" target="_blank" rel="noopener" class="yt-play r">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 5L19 12L8 19V5Z" fill="#c97b60"/>
+        </svg>
+      </a>
+
+      <h2 class="r">8 hours of deep sleep.<br>Free, on YouTube.</h2>
+      <p class="youtube-sub r">No account required. Just press play, put down your phone, and let SlowBeat do the rest.</p>
+
+      <a href="https://youtube.com" target="_blank" rel="noopener" class="btn-yt r">Watch on YouTube</a>
+
+      <div class="yt-tags r">
+        <span class="yt-tag">overnight session</span>
+        <span class="yt-tag">guided method</span>
+        <span class="yt-tag">science shorts</span>
+        <span class="yt-tag">nap series</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-left">
+        <a href="#" class="footer-logo">SlowBeat</a>
+        <span class="footer-tagline">Your heart knows the way.</span>
+      </div>
+      <ul class="footer-links">
+        <li><a href="#">Science</a></li>
+        <li><a href="#">YouTube</a></li>
+        <li><a href="#">Privacy</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-copy-row">
+      <span class="footer-copy">&copy; 2025 SlowBeat. All rights reserved.</span>
+    </div>
+  </footer>
+
+  <script>
+    // ── NAV SCROLL ─────────────────────────────────────────────────────────
+    (function () {
+      const nav = document.getElementById('nav');
+      const onScroll = () => {
+        if (window.scrollY > 40) {
+          nav.classList.add('scrolled');
+        } else {
+          nav.classList.remove('scrolled');
+        }
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+    })();
+
+    // ── SCROLL REVEAL ──────────────────────────────────────────────────────
+    (function () {
+      const els = document.querySelectorAll('.r');
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('v');
+            io.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      els.forEach(el => io.observe(el));
+    })();
+
+    // ── ECG CANVAS ─────────────────────────────────────────────────────────
+    (function () {
+      const canvas = document.getElementById('ecg-canvas');
+      const ctx = canvas.getContext('2d');
+      let W, H, offset = 0;
+
+      function resize() {
+        W = canvas.offsetWidth;
+        H = canvas.offsetHeight;
+        canvas.width = W;
+        canvas.height = H;
+      }
+
+      // Draw one QRS complex starting at x, centered on y
+      function drawQRS(startX, baseY, scale) {
+        const s = scale || 1;
+        ctx.beginPath();
+        ctx.moveTo(startX, baseY);
+        // P wave
+        ctx.bezierCurveTo(startX + 10*s, baseY, startX + 14*s, baseY - 6*s, startX + 18*s, baseY);
+        // flat
+        ctx.lineTo(startX + 26*s, baseY);
+        // Q dip
+        ctx.lineTo(startX + 30*s, baseY + 5*s);
+        // R spike up
+        ctx.lineTo(startX + 34*s, baseY - 28*s);
+        // S dip
+        ctx.lineTo(startX + 38*s, baseY + 8*s);
+        // return to base
+        ctx.lineTo(startX + 44*s, baseY);
+        // T wave
+        ctx.bezierCurveTo(startX + 52*s, baseY, startX + 56*s, baseY - 10*s, startX + 64*s, baseY);
+        // flat to next
+        ctx.lineTo(startX + 90*s, baseY);
+      }
+
+      function draw() {
+        if (!W || !H) { resize(); }
+        ctx.clearRect(0, 0, W, H);
+
+        ctx.strokeStyle = 'rgba(232, 164, 178, 0.05)';
+        ctx.lineWidth = 1;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+
+        const cycleWidth = 110;
+        const numRows = 3;
+        const rowSpacing = H / (numRows + 1);
+
+        for (let row = 0; row < numRows; row++) {
+          const baseY = rowSpacing * (row + 1);
+          const rowOffset = row * 37; // stagger rows
+
+          // Draw enough cycles to cover width + overflow for scrolling
+          const startX = -(offset + rowOffset) % cycleWidth;
+          for (let x = startX - cycleWidth; x < W + cycleWidth; x += cycleWidth) {
+            drawQRS(x, baseY, 1);
+            ctx.stroke();
+          }
+        }
+
+        offset += 0.4;
+        requestAnimationFrame(draw);
+      }
+
+      resize();
+      window.addEventListener('resize', resize);
+      draw();
+    })();
+
+    // ── BPM CURVE DRAW-ON-SCROLL ───────────────────────────────────────────
+    (function () {
+      const wrap = document.getElementById('bpm-chart-wrap');
+      const clipRect = document.getElementById('bpm-clip-rect');
+      const dots = document.querySelectorAll('#stage-dots circle');
+
+      if (!wrap || !clipRect) return;
+
+      const DURATION = 2200;
+      const DOT_POSITIONS = [0, 260, 540, 800, 1000]; // x positions in viewBox (0-1000)
+      const TOTAL_WIDTH = 1000;
+      let started = false;
+
+      function easeInOutCubic(t) {
+        return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
+      }
+
+      function animateCurve() {
+        if (started) return;
+        started = true;
+
+        const start = performance.now();
+
+        function frame(now) {
+          const elapsed = now - start;
+          const t = Math.min(elapsed / DURATION, 1);
+          const eased = easeInOutCubic(t);
+          const w = eased * TOTAL_WIDTH;
+
+          clipRect.setAttribute('width', String(w));
+
+          // Fade in dots as line reaches them
+          dots.forEach((dot, i) => {
+            if (w >= DOT_POSITIONS[i]) {
+              dot.classList.add('visible');
+            }
+          });
+
+          if (t < 1) {
+            requestAnimationFrame(frame);
+          }
+        }
+
+        requestAnimationFrame(frame);
+      }
+
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            animateCurve();
+            io.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.3 });
+
+      io.observe(wrap);
+    })();
+  </script>
+</body>
+</html>
